@@ -28,7 +28,7 @@ Start the webserver, then, either...
 -or use the search function to find a scene, then scrape it  
 -or enter your own data into the fields if you can't find a scene online.  
 Then click "Export" to copy the JSON location to the clipboard.  
-You can then launch XBVR -> Options -![Uploading Github3.png…]()
+You can then launch XBVR -> Options -![Github3](https://user-images.githubusercontent.com/92050698/138799895-7ccd2f91-03ed-4619-befd-f3b5a1eca47c.png)
 > Data import/export  
 Paste clipboard contents into "Bundle URL" and click "import content bundle"
 
@@ -57,6 +57,7 @@ headers= {
      "Accept": "application/json"
 }
 
+![Uploading Github3.png…]()
 
 ## Running
 python3 tpdb2xbvr.py  https://api.metadataapi.net/scenes/virtualrealporn-lara039s-new-friend
