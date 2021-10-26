@@ -24,11 +24,11 @@ Unix/macOS
 ### 3) Run "main.py"
 
 ## Instructions
-Click "Start Webserver", then, either...  
+Click "Start Webserver" (or run your own), then, either...  
 
 * scrape a scene from ThePornDB (see sample URLs below)  
 * or use the search function to find a scene on ThePornDB, then scrape it  
-* or manually enter your own data into the fields if you can't find a scene online.  
+* or manually enter your own data into the fields if you can't find a scene online.
 
 Then click "Export" to copy the JSON location to the clipboard.  This will create your import file.
 
@@ -44,9 +44,24 @@ https://api.metadataapi.net/scenes/wankz-vr-wankzvr-car-wash-1
 https://api.metadataapi.net/scenes/wankz-vr-paddys-pub    
 https://api.metadataapi.net/scenes/evileyevr-rescue-mission  
 
+## Additional Search Info
+The best way to search is to select a studio by clicking a studio button, then input keywords in the search bar and click "submit".
 
+Search Example:  
+* click "vrcosplayx"  
+* type: "pokemon" in search 
+* click "submit" (or press Enter)  
+
+Results
+> vr-cosplay-x-pokemon-officer-jenny-a-xxx-parody  
+> vr-cosplay-x-pokemon-team-rocket-jessie-a-xxx-parody
+> 
 
 ## Configuration
 Create an account on metadataapi.net and generate an api key.
-Edit tpdb2xbvr and update the headers to include this key.
+You can paste this key in the GUI and save your configuration with "Save Config".
+
+## Development  
+I am a noob.  Pull requests, code cleanup, and any pointers welcome.  This is still buggy, I'm learning python as I go.
+
 
