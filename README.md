@@ -28,7 +28,8 @@ Start the webserver, then, either...
 -or use the search function to find a scene, then scrape it  
 -or enter your own data into the fields if you can't find a scene online.  
 Then click "Export" to copy the JSON location to the clipboard.  
-You can then launch XBVR -> Options -> Data import/export  
+You can then launch XBVR -> Options -![Uploading Github3.png…]()
+> Data import/export  
 Paste clipboard contents into "Bundle URL" and click "import content bundle"
 
 
