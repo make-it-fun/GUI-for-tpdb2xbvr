@@ -69,7 +69,6 @@ class Gui:
             row('site'),
             row('_id'),
             row('scene_id'),
-            row('scene_type'),
             row('synopsis'),
             row('released'),
             row('homepage_url'),
@@ -305,7 +304,7 @@ class Gui:
 
         ]
 
-        self.window = sg.Window('tpdb2xvbr GUI Helper', layout, finalize=True)
+        self.window = sg.Window('GUI for tpdb2xbvr', layout, finalize=True)
 
     def bind_inputs(self, elem: str, tk_event='<Button-1>', event='+CLICK+', exclude=[], start=1, end=100) -> None:
         '''
@@ -419,7 +418,7 @@ class Gui:
 
         scene['_id'] = vals['-i_id-']
         scene['scene_id'] = vals['-iscene_id-']
-        scene['scene_type'] = vals['-iscene_type-']
+        scene['scene_type'] = 'VR'
         scene['title'] = vals['-ititle-']
         scene['studio'] = vals['-istudio-']
         scene['site'] = vals['-isite-']

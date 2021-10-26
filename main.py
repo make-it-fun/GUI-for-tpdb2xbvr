@@ -12,7 +12,7 @@ import PySimpleGUI as sg
 import shutil
 from datetime import date
 from natsort import natsorted
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Optional, Union
 from ui import Gui
 
@@ -25,7 +25,6 @@ def calculate_age(born: date, age_date: Optional[date] = None) -> Optional[int]:
 
     calc_date = age_date if age_date else date.today()
     return calc_date.year - born.year - ((calc_date.month, calc_date.day) < (born.month, born.day))
-
 
 
 def console(text: str, type: str = None) -> None:
@@ -64,24 +63,29 @@ def create_config(file: str, contents=None) -> None:
     else:
         console_text += f'Created config file {file}.\n'
 
+
 def fix_search(query, lookup):
     for k, v in lookup.lower():
         if k in query.lower():
             query.replace()
 
-def get_config(file: str, contents=None) -> dict:
+
+def get_config(file: str, contents: dict = None, create=True) -> dict:
     """ reads a json config file
-        if file does not exist, creates it (and any necessary dirs)
-        returns dict
+        if file does not exist, optionally creates it (and any necessary dirs) with 'contents' dict
     """
     if contents == None:
         data = None
     else:
         data = contents
-    if not Path(file).exists():
+    if not Path(file).exists() and create:
         create_config(file, data)
-    with open(file) as config_file:
-        return json.load(config_file)
+    try:
+        with open(file) as config_file:
+            return json.load(config_file)
+    except Exception as e:
+        print(e)
+        return None
 
 
 def highlight_cast(input: str, text: str) -> None:
@@ -100,13 +104,13 @@ def highlight_cast(input: str, text: str) -> None:
     gui.update_elem(elem=text, arguments={'text_color': '#ffa0dc', 'font': 'default 10 bold'})
 
 
-def load_performer(perf):
-    """ creates the xtras dict entries for filenames, filepaths, anx file_idx
+def init_performer(perf):
+    """ creates the xtras dict entries for filenames, filepaths, and file_idx
     :param perf: performer name, as included in 'xtras' dict
     :return: None
     """
     if perf:
-        filepaths = [f for f in Path(f'./img/performers/{perf}/').glob('*') if
+        filepaths = [f for f in Path(f'img/performers/{perf}/').glob('*') if
                      f.suffix in {'.jpg', '.png', '.jpeg', '.tiff', '.webp', '.gif'}]
         xtras[perf]['filepaths'] = natsorted(filepaths, key=lambda x: x.stem)
         xtras[perf]['filenames'] = [f.name for f in xtras[perf]['filepaths']]
@@ -114,12 +118,12 @@ def load_performer(perf):
 
 
 def process_image(url: str, dest: Union[Path, str], perf: Optional[str] = None, key: Optional[str] = None,
-                  size=(250, 250), add_to_xtras=False) -> None:
+                  size=(250, 250), add_to_xtras=True) -> None:
     """
     downloads an image and adds it to the xtras dict in the 'images' key
     :param url: image url
     :param dest: file destination, can be a string, pathlib Path, or fileobject
-    :param perf: str - performer name.  If empty, image will be added to both xtras[performer]['images'] dict
+    :param perf: str - performer name.  If empty, image will be added to both xtras[performer]['images']
     :param key: key of gui window image object to update, if any
     :param size: image size
     :return: None
@@ -136,7 +140,8 @@ def process_image(url: str, dest: Union[Path, str], perf: Optional[str] = None, 
 
         if add_to_xtras:
             for p in perfs:
-                xtras[p]['images'][Path(dest)] = url
+                xtras[p]['images'][Path(dest).as_posix()] = url
+
         if key:
             gui.window[key].update(data=gui.img_resize(dest, newsize=size), size=size)
 
@@ -158,6 +163,10 @@ def update_file_idx(idx, increment):
 
 
 def update_gui():
+    """
+    updates most gui elements
+
+    """
     gui.window.finalize()
     if xtras and current_performer in xtras:
         performer = xtras[current_performer]
@@ -246,7 +255,6 @@ if __name__ == '__main__':
 
     # Directory Setup
 
-
     # GUI Setup
     sg.theme('Light Blue5')
     gui = Gui()
@@ -326,7 +334,8 @@ if __name__ == '__main__':
             if values['-icovers-'].strip():
                 cover_image = values['-icovers-'].strip()
                 if cover_image:
-                    process_image(url=cover_image, dest=Path(Path.cwd() / 'img/temp/cover.png'), key='-COVER-', size=THUMBSIZE)
+                    process_image(url=cover_image, dest=Path(Path.cwd() / 'img/temp/cover.png'), key='-COVER-',
+                                  size=THUMBSIZE)
 
         elif event == '-igallery-':
             gui.window.finalize()
@@ -337,12 +346,13 @@ if __name__ == '__main__':
 
         # Scrape
         elif event == '-SCRAPE-':
+            # nuke cast inputs
             for i in range(1, 12):
                 gui.window[f'-icast {i}-'].update('')
 
+            # nuke tag inputs
             for i in range(1, 53):
                 gui.window[f'-itag{i}-'].update('')
-
 
             gui.window.finalize()  # finalize gui so we can read value['-API KEY-']
 
@@ -375,7 +385,6 @@ if __name__ == '__main__':
                     gui.window['-isite-'].update(gui.translate_str(scenes['site'], translate=constants.DB_STUDIOS))
                     gui.window['-i_id-'].update(scenes['_id'])
                     gui.window['-iscene_id-'].update(scenes['scene_id'])
-                    gui.window['-iscene_type-'].update('VR')
                     gui.window['-isynopsis-'].update(scenes['synopsis'])
                     gui.window['-ireleased-'].update(scenes['released'])
                     gui.window['-ihomepage_url-'].update(scenes['homepage_url'])
@@ -397,9 +406,8 @@ if __name__ == '__main__':
                     for f in files:
                         Path(f).unlink()
 
-
                     # populate image elements
-                    process_image(cover_image, 'img/temp/cover.png', key='-COVER-', size=THUMBSIZE)
+                    process_image(cover_image, 'img/temp/cover.png', key='-COVER-', size=THUMBSIZE, add_to_xtras=True)
                     process_image(gallery_image, 'img/temp/gallery.png', key='-GALLERY-', size=THUMBSIZE)
 
                     # get scene poster
@@ -419,19 +427,23 @@ if __name__ == '__main__':
 
                             # copy media already in '/img/temp' to '/img/performers/{performer}'
                             img_dir = Path(Path.cwd() / 'img/temp')
-                            files = [f for f in img_dir.glob('*')]
+                            files = [f for f in img_dir.glob('*') if f.is_file()]
                             for file in files:
+                                # strip digits from filenames (e.g. background1.png becomes background.png)
                                 removed_digits = ''.join(
-                                    [c for c in file.stem if not c.isdigit()])  # strip digits from filenames
+                                    [c for c in file.stem if
+                                     not c.isdigit()])
+                                # if the filename is a match for the following...
                                 if any(x in removed_digits for x in
                                        ['background', 'media', 'posters', 'gallery', 'cover'] if
                                        'placeholder' not in removed_digits):
-                                    shutil.copy(file,
-                                                xtras_dir / file.name)  # move the appropriate images to the img/performers/{performer} dir
+                                    # copy the appropriate images to the img/performers/{performer} dir
+                                    shutil.copy(file, xtras_dir / file.name)
 
-                                # if artwork has already been downloaded, load the performer artwork
-                            if Path(Path.cwd() / 'img/{performer}/xtras0.png').is_file():
-                                load_performer(performer)
+                                    # if artwork has already been downloaded, load the performer artwork
+                            temp = (Path.cwd() / f'img/performers/{performer}/xtra0.png')
+                            if Path(Path.cwd() / f'img/performers/{performer}/xtra0.png').is_file():
+                                init_performer(performer)
                             else:
                                 # download the first image for each performer
                                 try:
@@ -443,7 +455,7 @@ if __name__ == '__main__':
                                     performer_image_url = []
 
                                 # make filepaths, which is currently just a list of a single poster path
-                                filepaths = [f for f in Path(f'./img/performers/{performer}/').glob('*')
+                                filepaths = [f for f in Path(f'img/performers/{performer}/').glob('*')
                                              if
                                              f.suffix in {'.jpg', '.png', '.jpeg', '.tiff', '.webp',
                                                           '.gif'}]
@@ -459,7 +471,12 @@ if __name__ == '__main__':
                                 print(e)
                                 xtras[performer]['file_idx'] = 0
 
-                    current_performer = list(xtras)[0]  # assign the first performer as the current performer
+                    try:
+                        current_performer = list(xtras)[0]  # assign the first performer as the current performer
+                    except IndexError as e:
+                        print(e)
+                        current_performer = None
+
                     highlight_cast('-icast 1-', '-tcast 1-')
 
                     update_gui()  # will update the BIGIMAGE and ARTIST fields based on current_performer
@@ -491,18 +508,26 @@ if __name__ == '__main__':
                         console_text += f'No additional artwork available for {performer}.\n'
                         console(console_text)
                     else:
+                        img_cache = {}
                         for idx, poster_url in enumerate(xtras[performer]['artist_posters']):
+                            # skip the first image as we already have it downloaded
                             if idx == 0:
                                 continue
-                            process_image(url=poster_url, dest=f'./img/performers/{performer}/xtra{idx}.png',
+                            xtra_img = Path(f'img/performers/{performer}/xtra{idx}.png')
+                            process_image(url=poster_url, dest=xtra_img,
                                           perf=performer)
 
-                            # gui.img_download(poster, f'./img/performers/{performer}/xtra{idx}.png')
-                            console_text += f'Downloaded {performer}/xtra{idx}.png\n'
+                            # add the image location as a key to and the url so we can access later for gallery and covers
+                            img_cache[xtra_img.name] = poster_url
+                            console_text += f'Downloaded {xtra_img.name}\n'
                             console(console_text)
 
+                        # write the dict to "img_cache.json" file so that we can access the URLs later without re-scraping
+                        if img_cache:
+                            write_json(f'img/performers/{performer}/img_cache.json', img_cache)
+
                     # load performer filepaths, filenames, create file_idx, etc
-                    load_performer(performer)
+                    init_performer(performer)
                     try:  # set to new xtra art download xtra1.png. We've already downlaoded xtra0.png previously
                         file_idx = xtras[performer]['filenames'].index('xtra1.png')
                         xtras[performer]['file_idx'] = file_idx
@@ -530,29 +555,57 @@ if __name__ == '__main__':
                 # remove the files and replace images with
                 update_gui()
                 gui.window['-FILES-'].update([])
-                gui.window['-BIGIMAGE-'].update(data=gui.img_resize('img/placeholders/bigimage-placeholder.png', newsize=BIGSIZE),
-                                                size=BIGSIZE)
+                gui.window['-BIGIMAGE-'].update(
+                    data=gui.img_resize('img/placeholders/bigimage-placeholder.png', newsize=BIGSIZE),
+                    size=BIGSIZE)
 
-        # replaces cover with selected image
-        elif event == '-MAKE COVER-':
+
+        # replace cover or gallery
+        elif event in ['-ADD TO GALLERY-', '-MAKE COVER-']:
+            if event == '-ADD TO GALLERY-':
+                gui_elem = '-GALLERY-'
+                url_elem = '-igallery-'
+            else:
+                gui_elem = '-COVER-'
+                url_elem = '-icovers-'
+
+            # update GUI gallery image
             try:
                 selected = values['-FILES-'][0]
                 filepaths = xtras[current_performer]['filepaths']
                 file_idx = xtras[current_performer]['file_idx']
-                new_cover = filepaths[file_idx]
-                gui.window['-COVER-'].update(data=gui.img_resize(new_cover, newsize=THUMBSIZE))
-            except IndexError as e:
-                pass
+                selected_path = filepaths[file_idx]
+                gui.window[gui_elem].update(data=gui.img_resize(selected_path, newsize=THUMBSIZE))
 
-        elif event == '-ADD TO GALLERY-':
-            try:
-                selected = values['-FILES-'][0]
-                filepaths = xtras[current_performer]['filepaths']
-                file_idx = xtras[current_performer]['file_idx']
-                new_cover = filepaths[file_idx]
-                gui.window['-GALLERY-'].update(data=gui.img_resize(new_cover, newsize=THUMBSIZE))
             except IndexError as e:
-                pass
+                selected_path = None
+                print(e)
+
+            if selected_path:
+                # update '-igallery-' URL
+                try:
+                    new_url = None
+                    # if selected image is from the current scene (and not artist xtra images)
+                    if xtras[current_performer]['images']:
+
+                        selected_key = selected_path.name  # poster0.png, etc
+                        for key, val in xtras[current_performer]['images'].items():
+                            if Path(key).name == selected_key:
+                                new_url = xtras[current_performer]['images'][f'img/temp/{selected_key}']
+
+                    # if selected image is not from the current scene, check if it's an xtra image
+                    if not new_url:
+                        xtra_key = selected_path.name
+                        art = get_config(f'img/performers/{current_performer}/img_cache.json')
+                        if art and xtra_key in art:
+                            new_url = art[xtra_key]
+                    if new_url:
+                        gui.window[url_elem].update(new_url)
+
+                except Exception as e:
+                    print(e)
+
+
 
         # Webserver
         elif event == '-WEBSERVER BUTTON-':
@@ -666,17 +719,20 @@ if __name__ == '__main__':
                 selected_scene = values['-SCENE RESULTS-'][0]
                 gui.window['-iThePornDB URL-'].update(f'https://api.metadataapi.net/scenes/{selected_scene}')
                 if search_result and search_scenes:
-                    #search_idx = search_scenes.index(selected_scene)
+                    # search_idx = search_scenes.index(selected_scene)
                     search_idx = 0
                     for idx, result in enumerate(search_result['data']):
                         if result['slug'] == selected_scene:
                             search_idx = idx
-                    #search_idx = search_result.index(selected_scene)
+                    # search_idx = search_result.index(selected_scene)
                     if 'image' in search_result['data'][search_idx]:
                         scene_result_thumb = search_result['data'][search_idx]['image']
-                        process_image(scene_result_thumb, dest='img/temp/search/cover.png', size=(250,150), key='-SEARCH IMAGE-')
+                        process_image(scene_result_thumb, dest='img/temp/search/cover.png', size=(250, 150),
+                                      key='-SEARCH IMAGE-')
                 else:
-                    gui.window['-SEARCH IMAGE-'].update(data=Gui.img_resize('./img/placeholders/bigimage-placeholder.png', first=False, newsize=(250, 150)))
+                    gui.window['-SEARCH IMAGE-'].update(
+                        data=Gui.img_resize('img/placeholders/bigimage-placeholder.png', first=False,
+                                            newsize=(250, 150)))
 
 
 
