@@ -14,6 +14,14 @@ https://github.com/Tweeticoats/tpdb2xbvr
 
 ## Installation
 
+### 0) Clone Repo
+Create a folder (like on your desktop, e.g. "projects").  On windows, you can type "cmd" in file explorer and it will drop you into this folder.  
+From command line or terminal paste the following:
+> git clone https://github.com/make-it-fun/GUI-for-tpdb2xbvr.git  
+> 
+Then change into the directory with:
+> cd ./GUI-for-tpdb2xbvr
+
 ### 1) Create virtual environment
 
 from project directory, create virtual environment with 
@@ -80,6 +88,9 @@ Search Example:
 Results
 > vr-cosplay-x-pokemon-officer-jenny-a-xxx-parody  
 > vr-cosplay-x-pokemon-team-rocket-jessie-a-xxx-parody
+
+## Download Art
+You man download additional performer art with the "Download Art" buton.  This art can optionally be used to replace the cover or gallery image.
 
 ## Development  
 I am a python noob.  Pull requests, code cleanup, and any pointers welcome.  This is still buggy, I'm learning python as I go.
