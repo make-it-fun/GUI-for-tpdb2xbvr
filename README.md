@@ -30,7 +30,7 @@ Start the webserver, then, either...
 Then click "Export" to copy the JSON location to the clipboard.  
 You can then launch XBVR -> Options -> Data import/export  
 Paste clipboard contents into "Bundle URL" and click "import content bundle"
-![Github](https://user-images.githubusercontent.com/92050698/138786840-3cdaa793-3fad-4658-bfab-f44b2e637886.png)
+
 
 
 ## Sample URLs to scrape
