@@ -1,19 +1,28 @@
 # GUI for tpdb2xbvr
-This project is a gui wrapper as well as scene search that has been built upon tpdb2xbvr by Tweeticoats.  
-It can be used to search as well as scrape ThePornDB for scenes that are not found by the scraper or to manually enter scenes that are not found in ThePornDB.
+This project is a gui wrapper for tpdb2xbvr by Tweeticoats for ThePornDB (https://metadataapi.net/).  Scene search functionality has also been added.
+
+The program is useful for the following:
+* Scrape scenes from ThePornDB that are not found in XBVR.  Then import into XBVR.
+* Search for scenes from ThePornDB from within the GUI (then scrape them).  Then Import into XBVR.
+* Manually enter a scene to be imported into XBVR, even if it doesn't exist in ThePornDB.  Add your own cover, gallery image, url, tags, etc.
 
 ![Github3](https://user-images.githubusercontent.com/92050698/138799895-7ccd2f91-03ed-4619-befd-f3b5a1eca47c.png)
 
-Tweeticoats program can be found here:  
+Tweeticoats awesome program can be found here:  
 
 https://github.com/Tweeticoats/tpdb2xbvr
 
 ## Installation
 
-### 1) Create virtual environment  
-from project directory, create virtual environment with 
+### 1) Create virtual environment
 
+from project directory, create virtual environment with 
+Windows:
 >python -m venv env
+> 
+Unix/macOS:
+>python3 -m venv env
+
 ### 2) Activate virtual environment
 Windows:
 > .\env\Scripts\activate  
@@ -21,7 +30,23 @@ Windows:
 Unix/macOS  
 > source env/bin/activate
 
-### 3) Run "main.py"
+### 3) Install requirements
+Windows:
+> python -m pip install -r requirements.txt
+> 
+Unix/macOS  
+> python3 -m pip install -r requirements.txt
+
+### 4) Run "main.py"
+Windows:
+> python main.py
+>
+Unix/macOS:
+> python3 main.py
+
+## Configuration
+Create an account on ThePornDB at https://metadataapi.net and generate an api key.
+You can paste this key in the GUI and save your configuration with "Save Config".
 
 ## Instructions
 Click "Start Webserver" (or run your own), then, either...  
@@ -55,13 +80,12 @@ Search Example:
 Results
 > vr-cosplay-x-pokemon-officer-jenny-a-xxx-parody  
 > vr-cosplay-x-pokemon-team-rocket-jessie-a-xxx-parody
-> 
-
-## Configuration
-Create an account on metadataapi.net and generate an api key.
-You can paste this key in the GUI and save your configuration with "Save Config".
 
 ## Development  
-I am a noob.  Pull requests, code cleanup, and any pointers welcome.  This is still buggy, I'm learning python as I go.
+I am a python noob.  Pull requests, code cleanup, and any pointers welcome.  This is still buggy, I'm learning python as I go.
+
+### Tests
+The tests are incomplete but cover some class methods and functions.  
+
 
 
