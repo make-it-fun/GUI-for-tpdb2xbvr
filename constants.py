@@ -29,8 +29,9 @@ STUDIOS = {
     'vrcosplay ': 'vrcosplayx',
     'vr edging' : 'vredging',
     'vrhush ': 'vr hush',
+    'vrlatina': 'vrlatina',
     'vr sexperts': 'vrsexperts',
-    'wankzvr': 'wankz vr'
+    'wankzvr': 'wankz vr',
 }
 
 # used with Gui.translate_str() so that sites match what is in the xbvr database
@@ -60,6 +61,7 @@ DB_STUDIOS = {
     'swallowbay': ['swallow bay'],
     'wankzvr': ['wankz vr'],
     'vredging' : ['vr edging'],
+    'vrlatina' : ['vrlatina'],
 
 }
 
