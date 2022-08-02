@@ -419,6 +419,12 @@ if __name__ == '__main__':
                     # get scene media
                     process_image(scenes['media'], f'img/temp/media.png')
 
+                    # copy URL to clipboard
+                    pyperclip.copy(url)
+                    console_text += 'Copied Scene TPDB URL to Clipboard\n'
+                    console(console_text)
+
+
                     if xtras:
                         for performer in xtras:
                             # ensure performer directory exists
